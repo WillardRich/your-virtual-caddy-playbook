@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Virtual Caddy | Developer Playbook</title>
+<style>
+:root{--bg:#f5f7f4;--ink:#18251e;--muted:#53645a;--green:#245b43;--line:#d9e2da;--card:#fff;--soft:#e8f0e9}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:#14291f;color:#fff;padding:52px 22px 44px}header .wrap,main{max-width:1080px;margin:auto}header p{max-width:680px;color:#d5e4d9}header h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.08;margin:10px 0} .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:700;color:#a8c8b2}
+main{padding:28px 20px 70px}.notice{background:#fff8e6;border:1px solid #ead9a7;border-radius:12px;padding:14px 18px;margin-bottom:22px;color:#58471b}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:28px}nav{align-self:start;position:sticky;top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}nav strong{display:block;margin-bottom:8px}nav a{display:block;color:var(--green);text-decoration:none;padding:5px 0;font-size:.94rem}nav a:hover{text-decoration:underline}
+section{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:24px;margin-bottom:18px;scroll-margin-top:20px}h2{font-size:1.35rem;margin:0 0 10px}h3{font-size:1rem;margin:20px 0 6px}p{margin:8px 0}ul,ol{padding-left:23px}li{margin:5px 0}a{color:#1d6447}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}code{background:#edf2ed;padding:2px 5px;border-radius:4px;font-size:.91em}pre{overflow:auto;background:#17241d;color:#e7f2e9;padding:15px;border-radius:10px;font-size:.9rem}.tag{display:inline-block;background:var(--soft);color:var(--green);border-radius:99px;padding:3px 9px;font-size:.78rem;font-weight:700}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mini{background:#f8faf8;border:1px solid var(--line);border-radius:10px;padding:13px}.mini b{display:block}.muted{color:var(--muted)}footer{max-width:1080px;margin:auto;padding:0 20px 40px;color:var(--muted);font-size:.9rem}
+@media(max-width:760px){.layout{grid-template-columns:1fr}nav{position:static}.grid{grid-template-columns:1fr}section{padding:18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">Engineering onboarding · v1.0 · October 2026</div><h1>Your Virtual Caddy<br>Developer Playbook</h1><p>A practical first-day guide for contributing to the golf-advice MVP: get the code running, make a safe change, test it, and ship through review.</p></div></header>
+<main>
+<div class="notice"><b>Setup note:</b> This playbook documents the tools already used on the project (Lovable → GitHub → Cursor, Supabase Auth/database) and defines a concrete baseline for controls that still need team confirmation. Replace the two project-specific links below with the actual repository and board URLs before submitting; do not represent a proposed control as already enforced.</div>
+<div class="layout">
+<nav><strong>On this page</strong>
+<a href="#language">1. Language selection</a><a href="#ide">2. IDE and setup</a><a href="#process">3. Development strategy</a><a href="#git">4. Git strategy and controls</a><a href="#issues">5. Issue tracking</a><a href="#ai">6. AI agents and controls</a><a href="#quality">7. Code quality</a><a href="#testing">8. Testing</a><a href="#operations">9. Other tools and procedures</a><a href="#firstday">First-day checklist</a></nav>
+<div>
+<section id="language"><span class="tag">01</span><h2>Language selection</h2>
+<p><b>Product:</b> Your Virtual Caddy, a beginner-focused golf decision-support web app. The first version prioritizes a simple shot-advice flow; course/GPS integrations can come later.</p>
+<div class="grid"><div class="mini"><b>TypeScript / JavaScript</b>Primary web application language. TypeScript adds compile-time checks for UI state, profile data, and API responses; JavaScript runs in the browser.</div><div class="mini"><b>SQL</b>Supabase/PostgreSQL schema changes, row-level security (RLS), and data access policies.</div><div class="mini"><b>HTML + CSS</b>Semantic page structure, responsive layout, and styling.</div><div class="mini"><b>JSON / environment variables</b>Tool configuration and local settings. Never commit secrets.</div></div>
+<p class="muted">The existing project was built through Lovable and moved into GitHub/Cursor. Confirm the exact framework and package manager from <code>package.json</code> before running commands. The instructions below assume a typical Vite-based TypeScript frontend; use the repository's scripts if they differ.</p></section>
+
+<section id="ide"><span class="tag">02</span><h2>IDE selection and setup</h2>
+<p><b>Standard IDE: Cursor</b> — AI-assisted code editor with a VS Code-style workflow. GitHub is the source of truth; Lovable may be used for early UI iteration, but changes must be reviewed in the repository.</p>
+<p><a href="https://www.cursor.com/downloads">Download Cursor</a> · <a href="https://git-scm.com/downloads">Install Git</a> · <a href="https://nodejs.org/en/download">Install Node.js LTS</a></p>
+<ol><li>Install Cursor, Git, and the current Node.js LTS release.</li><li>Accept the GitHub repository invitation and sign in to GitHub in your browser.</li><li>Clone the repository from GitHub (Code → HTTPS → copy URL), then in a terminal run:</li></ol>
+<pre>git clone &lt;YOUR_GITHUB_REPOSITORY_URL&gt;
+cd &lt;repository-folder&gt;
+npm install
+npm run dev</pre>
+<ol start="4"><li>Open the folder in Cursor. In <code>package.json</code>, inspect <code>scripts</code> and use the actual development command if it is not <code>npm run dev</code>.</li><li>Create a local <code>.env</code> file only if the project’s README or environment example requires it. Ask the project owner for the correct development Supabase URL and anon/publishable key. Never copy production service-role keys to a laptop.</li><li>Open the local URL printed by the dev server, commonly <code>http://localhost:5173</code>.</li></ol>
+<p><b>Success check:</b> the app loads locally, browser console has no new errors, and you can explain which files power the page you changed.</p></section>
+
+<section id="process"><span class="tag">03</span><h2>Development strategy</h2>
+<p><b>Workflow: lightweight Kanban.</b> It fits a small MVP because work can move continuously without waiting for a formal sprint boundary.</p>
+<ul><li><b>Backlog:</b> ideas and bugs not ready to start.</li><li><b>Ready:</b> small, clearly described work with acceptance criteria.</li><li><b>In progress:</b> one owner actively working on it. Keep work-in-progress low; finish before starting another task.</li><li><b>In review:</b> pull request is open and checks/review are pending.</li><li><b>Done:</b> acceptance criteria met, checks pass, reviewed change merged, and deployment verified when applicable.</li></ul>
+<h3>Daily routine</h3><ol><li>Pick the highest-priority ready issue; confirm scope and acceptance criteria.</li><li>Post a brief update when blocked or when the plan changes.</li><li>Open a pull request early for feedback; link it to the issue.</li><li>Review teammates' changes, run checks, and update the board when work moves.</li></ol>
+<p>Keep tasks small enough to review in one sitting. Every issue should describe the user impact, expected behavior, and a way to verify completion.</p></section>
+
+<section id="git"><span class="tag">04</span><h2>Git strategy and controls</h2>
+<p><b>Source of truth:</b> GitHub. Use short-lived feature branches; do not work directly on the protected default branch.</p>
+<pre>git switch main
+git pull
+git switch -c feat/123-shot-advice-copy
+# make and test changes
+git add .
+git commit -m "feat(advice): clarify shot recommendation"
+git push -u origin feat/123-shot-advice-copy</pre>
+<h3>Branch and commit conventions</h3><ul><li>Branch names: <code>feat/123-short-description</code>, <code>fix/124-short-description</code>, <code>docs/125-short-description</code>.</li><li>Commit format: <code>type(scope): imperative summary</code>. Types: <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>test</code>, <code>refactor</code>, <code>chore</code>.</li><li>One logical change per pull request. Link the issue and include what changed, how it was tested, screenshots for UI changes, and any migration/config impact.</li></ul>
+<h3>Review controls</h3><p><b>Required baseline to configure in GitHub:</b> protect <code>main</code>; require pull requests; require at least one approval when a second reviewer is available; require CI checks; dismiss stale approvals after new commits; block force pushes and branch deletion. For a solo/student project, document when a second reviewer is unavailable rather than claiming approvals are enforced.</p>
+<p><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches">GitHub branch protection guide</a></p></section>
+
+<section id="issues"><span class="tag">05</span><h2>Issue tracking</h2>
+<p><b>Tool:</b> GitHub Projects, connected to the code repository so issues, pull requests, and work status stay together.</p>
+<p><a href="https://github.com/projects">Open GitHub Projects</a> · <a href="https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects">Project setup guide</a></p>
+<p><b>Project board link:</b> <em>Replace this line with the actual Your Virtual Caddy board URL after creating the board.</em></p>
+<h3>Issue template</h3><pre>Title: [Feature/Bug] short description
+
+Problem / user impact:
+Expected behavior:
+Acceptance criteria:
+- [ ] ...
+- [ ] ...
+Test plan:
+Dependencies / risks:
+</pre>
+<p>Labels to start with: <code>bug</code>, <code>feature</code>, <code>docs</code>, <code>security</code>, <code>good first issue</code>. Do not put passwords, access tokens, or private user data in an issue.</p></section>
+
+<section id="ai"><span class="tag">06</span><h2>AI agents and controls</h2>
+<p><b>Approved workflow:</b> Cursor AI for code explanation, scaffolding, refactoring suggestions, and tests; Lovable for rapid UI prototypes when appropriate. GitHub remains the source of truth. Treat generated output as an untrusted contribution, not as approved code.</p>
+<ul><li>Never paste production secrets, service-role keys, private customer data, or confidential credentials into an AI prompt.</li><li>Give the agent a narrow task and explicit constraints; inspect every changed file and the full diff.</li><li>Do not accept generated SQL/RLS policies, authentication logic, authorization checks, or dependency changes without manually validating them.</li><li>Run lint, tests, and a security review after AI-assisted changes. The developer who commits the change is responsible for it.</li><li>Do not let an agent deploy to production, rotate credentials, delete data, or run destructive commands without explicit human review.</li><li>Do not treat AI-generated citations, API behavior, or golf/course recommendations as verified facts; validate against trusted sources and product requirements.</li></ul>
+<p><a href="https://www.cursor.com/">Cursor</a> · <a href="https://lovable.dev/">Lovable</a></p></section>
+
+<section id="quality"><span class="tag">07</span><h2>Code quality</h2>
+<p>Use the repository's existing scripts/config first. If the repo does not yet enforce checks, add these as the initial baseline rather than assuming they are already installed.</p>
+<div class="grid"><div class="mini"><b>ESLint</b>Finds common JavaScript/TypeScript mistakes and suspicious patterns. <a href="https://eslint.org/docs/latest/use/getting-started">Setup docs</a></div><div class="mini"><b>Prettier</b>Consistent formatting. <a href="https://prettier.io/docs/">Setup docs</a></div><div class="mini"><b>GitHub Actions</b>Run checks on every pull request. <a href="https://docs.github.com/en/actions">Docs</a></div><div class="mini"><b>Dependabot + secret scanning</b>Identify dependency updates and exposed credentials. Availability depends on repository settings/plan. <a href="https://docs.github.com/en/code-security">Security docs</a></div></div>
+<h3>Suggested package scripts</h3><p>Only add scripts after confirming the corresponding packages/config exist.</p><pre>"scripts": {
+  "dev": "vite",
+  "build": "tsc -b && vite build",
+  "lint": "eslint .",
+  "format:check": "prettier --check .",
+  "test": "vitest run"
+}</pre>
+<p>Before merging: no lint errors; formatting check passes; production build passes; no unexplained new warnings. Never suppress a rule merely to make CI green—explain the reason in the code review.</p></section>
+
+<section id="testing"><span class="tag">08</span><h2>Testing frameworks</h2>
+<p><b>Proposed baseline for a TypeScript web app:</b> Vitest for unit/component-adjacent tests and React Testing Library if the UI uses React. Use Playwright for a small set of browser-level smoke tests once the core flows stabilize. Verify the actual framework in the repo before installing anything.</p>
+<ul><li><b>Unit tests:</b> distance/club selection logic, input validation, formatting, and other pure functions.</li><li><b>Component tests:</b> required inputs, loading/error states, and readable advice output.</li><li><b>Integration checks:</b> sign-up/login, profile read/write, and Supabase RLS behavior using a development project and test account.</li><li><b>Smoke test:</b> app loads; user can sign in; onboarding/profile saves; advice form validates inputs and renders a result.</li></ul>
+<pre># Use only scripts that exist in package.json
+npm run lint
+npm run test
+npm run build</pre>
+<p><a href="https://vitest.dev/guide/">Vitest</a> · <a href="https://testing-library.com/docs/react-testing-library/intro/">React Testing Library</a> · <a href="https://playwright.dev/docs/intro">Playwright</a></p>
+<p>Bug fixes should include a regression test when practical. Never test against production user accounts or production data.</p></section>
+
+<section id="operations"><span class="tag">09</span><h2>Other controls, tools, and procedures</h2>
+<h3>Supabase: authentication and database</h3><p>Supabase is used for authentication and PostgreSQL data. The project has a <code>profiles</code> table keyed to the authenticated user, with profile fields and an onboarding-completed flag; row-level security policies should restrict users to their own rows.</p>
+<ol><li>Get access to the team's Supabase project from the owner; use development credentials locally.</li><li>Apply schema changes through reviewed SQL migration files, not undocumented dashboard-only edits.</li><li>Enable RLS on tables containing user data. Policies must scope reads/writes to the authenticated user, typically by comparing the row's user ID to <code>auth.uid()</code>.</li><li>Test authorization as two different users: one user must not read or modify the other's profile.</li></ol>
+<p><a href="https://supabase.com/dashboard">Supabase dashboard</a> · <a href="https://supabase.com/docs/guides/database/postgres/row-level-security">RLS guide</a> · <a href="https://supabase.com/docs/guides/auth">Auth guide</a></p>
+<h3>Secrets and environment configuration</h3><ul><li>Keep local environment files out of Git; ensure <code>.env</code> is in <code>.gitignore</code>.</li><li>Commit a <code>.env.example</code> containing variable names only, never values.</li><li>Browser-exposed Supabase anon/publishable keys are not a substitute for RLS. Never expose the service-role key in frontend code.</li><li>If a secret is committed or pasted publicly, treat it as compromised: tell the project owner, rotate it, and remove it from active use.</li></ul>
+<h3>Deployment and release</h3><ol><li>Merge only after review and checks pass.</li><li>Deploy through the configured hosting provider's connected GitHub workflow; confirm the actual provider and production URL with the project owner.</li><li>For database changes, back up or otherwise protect important data, review migration order, and verify RLS after deployment.</li><li>Run the smoke-test checklist against the deployed version and check logs for errors.</li><li>If a release breaks the app, revert the code change or roll back using the hosting/database provider's supported process; communicate the issue and avoid unreviewed emergency edits.</li></ol>
+<h3>Support and incident handling</h3><p>This MVP does not yet have a formal on-call rotation documented. For a production issue, capture the time, affected flow, error message, and steps to reproduce; notify the project owner. Do not share user information or secrets in public tickets. Prioritize authentication failures, data exposure, and data loss above cosmetic bugs.</p></section>
+
+<section id="firstday"><span class="tag">START HERE</span><h2>First-day checklist</h2>
+<ul><li>☐ Accept GitHub repository invitation and open the project board.</li><li>☐ Install Cursor, Git, and Node.js LTS.</li><li>☐ Clone repository and install dependencies.</li><li>☐ Obtain development-only Supabase configuration securely.</li><li>☐ Run the app locally and inspect the package scripts.</li><li>☐ Pick one small issue, create a branch, and make a focused change.</li><li>☐ Run lint/tests/build commands that exist in the repo.</li><li>☐ Open a pull request with issue link, test results, and screenshots when relevant.</li><li>☐ Confirm review, merge, deployment, and smoke-test steps with the project owner.</li></ul>
+<p><b>Useful links:</b> <a href="https://github.com/">GitHub</a> · <a href="https://www.cursor.com/downloads">Cursor download</a> · <a href="https://nodejs.org/en/download">Node.js</a> · <a href="https://supabase.com/docs">Supabase docs</a></p></section>
+</div></div>
+</main>
+<footer>Owner: Your Virtual Caddy project team · Review this playbook when the stack, controls, or deployment process changes. Verify all team-specific settings before treating proposed controls as enforced.</footer>
+</body></html>
